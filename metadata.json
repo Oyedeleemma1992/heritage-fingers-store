@@ -1,0 +1,6 @@
+{
+  "name": "Heritage Finger",
+  "description": "Pan-African Stores Ltd. - Authentic African Food & Groceries in the UK.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
