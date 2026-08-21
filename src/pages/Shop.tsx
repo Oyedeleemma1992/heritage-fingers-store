@@ -27,7 +27,8 @@ export const Shop = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const activeCategories = CATEGORIES.filter(cat => cat === 'All' || products.some(p => p.category === cat));
+  // Updated to show all categories from CATEGORIES list
+  const activeCategories = CATEGORIES;
 
   return (
     <div className="bg-transparent min-h-screen py-12">
@@ -57,7 +58,7 @@ export const Shop = () => {
 
               <div>
                 <h3 className="font-serif font-bold text-lg text-[#171717] mb-4">Categories</h3>
-                <ul className="space-y-2">
+                <ul className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
                   {activeCategories.map(category => (
                     <li key={category}>
                       <button
@@ -108,7 +109,7 @@ export const Shop = () => {
               </div>
             ) : (
               <div className="text-center py-20 bg-white rounded-xl border border-gray-100 flex flex-col items-center">
-                <p className="text-gray-500 text-lg mb-2">No products found matching your search.</p>
+                <p className="text-gray-500 text-lg mb-2">No products found matching this category or search.</p>
                 <p className="font-bold text-[#171717] mb-6">Can't find what you're looking for?</p>
                 
                 <a 

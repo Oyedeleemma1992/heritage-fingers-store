@@ -40,6 +40,12 @@ import yamTubersWhole from '../assets/images/yam_tubers_whole_1787000183958.jpg'
 import plantainFlourBowl from '../assets/images/plantain_flour_bowl_1787001046901.jpg';
 import plantainFlourScoop from '../assets/images/plantain_flour_scoop_1787001152993.jpg';
 
+// NEW: Added ProductVariant interface
+export interface ProductVariant {
+  size: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -50,32 +56,35 @@ export interface Product {
   imageUrl: string;
   imageUrls?: string[];
   available: boolean;
+  variants?: ProductVariant[]; // NEW: Added variants support
 }
 
+// NEW: Expanded categories list based on inventory needs
 export const CATEGORIES = [
   'All',
-  'African Groceries',
-  'Grains & Staples',
-  'Dry Foods',
+  'Spices & Seasonings',
+  'Fresh Produce (Tomatoes, Peppers & Vegetables)',
+  'Dry Fish & Crayfish',
+  'Fresh & Frozen Fish',
+  'Meat & Poultry',
+  'Grains, Rice & Staples',
+  'Flour & Swallow',
   'Oils, Sauces & Condiments',
-  'Snacks',
+  'Cooked Foods & Savouries (Moi Moi, Small Chops)',
+  'Snacks & Bakery',
   'Drinks & Beverages',
-  'African Ingredients',
-  'Bakery & Cakes',
-  'Small Chops & Savouries',
-  'Frozen Foods',
-  'Special Orders',
+  'Special Bulk Orders'
 ];
 
 export const PRODUCTS: Product[] = [
-  // --- Grains & Staples ---
+  // --- Grains, Rice & Staples ---
   {
     id: 'gs1',
     name: 'Nigerian Honey Beans (Oloyin)',
     description: 'Premium Nigerian honey beans, also known as Oloyin, perfect for traditional African meals.',
     price: 8.99,
     size: '1.5kg',
-    category: 'Grains & Staples',
+    category: 'Grains, Rice & Staples',
     imageUrl: oloyinBowl,
     imageUrls: [oloyinBowl, oloyinMacro, oloyinSack],
     available: true,
@@ -86,7 +95,7 @@ export const PRODUCTS: Product[] = [
     description: 'Convenient peeled beans prepared for easier cooking and delicious Nigerian dishes like akara and moi moi.',
     price: 5.50,
     size: '1kg',
-    category: 'Grains & Staples',
+    category: 'Grains, Rice & Staples',
     imageUrl: peeledBowl,
     imageUrls: [peeledBowl, peeledMacro, peeledScoop],
     available: true,
@@ -97,7 +106,7 @@ export const PRODUCTS: Product[] = [
     description: 'Traditional unpolished Nigerian local rice, known for its unique aroma and flavour.',
     price: 12.99,
     size: '1kg',
-    category: 'Grains & Staples',
+    category: 'Grains, Rice & Staples',
     imageUrl: ofadaBowl,
     imageUrls: [ofadaBowl, ofadaMacro, ofadaScoop],
     available: true,
@@ -108,33 +117,22 @@ export const PRODUCTS: Product[] = [
     description: 'Crispy, sour cassava flakes traditionally produced in Ijebu. Perfect for soaking or making eba.',
     price: 6.50,
     size: '1.5kg',
-    category: 'Grains & Staples',
+    category: 'Grains, Rice & Staples',
     imageUrl: ijebuGarriBowl,
     imageUrls: [ijebuGarriBowl, ijebuGarriMacro, ijebuGarriScoop],
     available: true,
   },
+  
+  // --- Flour & Swallow ---
   {
     id: 'gs5',
     name: 'Poundo Yam',
     description: 'Quick and easy poundo yam flour. Achieves a smooth, lump-free texture for your favourite soups.',
     price: 9.50,
     size: '2kg',
-    category: 'Grains & Staples',
+    category: 'Flour & Swallow',
     imageUrl: poundedYamPrepared,
     imageUrls: [poundedYamPrepared, poundedYamServed, poundedYamFlour],
-    available: true,
-  },
-
-  // --- African Groceries ---
-  {
-    id: 'ag1',
-    name: 'Yam Tubers',
-    description: 'Fresh, premium white African yams. Perfect for boiling, roasting, or pounding.',
-    price: 8.00,
-    size: 'Large Tuber',
-    category: 'African Groceries',
-    imageUrl: yamTubersWhole,
-    imageUrls: [yamTubersWhole],
     available: true,
   },
   {
@@ -143,7 +141,7 @@ export const PRODUCTS: Product[] = [
     description: '100% natural unripe plantain flour, a healthy alternative for swallows and baking.',
     price: 7.99,
     size: '1kg',
-    category: 'African Groceries',
+    category: 'Flour & Swallow',
     imageUrl: plantainFlourBowl,
     imageUrls: [plantainFlourBowl, plantainFlourScoop],
     available: true,
@@ -154,7 +152,7 @@ export const PRODUCTS: Product[] = [
     description: 'Finely milled cassava flour for a variety of baking and cooking needs.',
     price: 5.99,
     size: '1kg',
-    category: 'African Groceries',
+    category: 'Flour & Swallow',
     imageUrl: 'https://i.ibb.co/BpDy6F3/cass1.jpg',
     imageUrls: [
       'https://i.ibb.co/BpDy6F3/cass1.jpg',
@@ -165,14 +163,27 @@ export const PRODUCTS: Product[] = [
     available: true,
   },
 
-  // --- Dry Foods ---
+  // --- Fresh Produce & Tubers ---
+  {
+    id: 'ag1',
+    name: 'Yam Tubers',
+    description: 'Fresh, premium white African yams. Perfect for boiling, roasting, or pounding.',
+    price: 8.00,
+    size: 'Large Tuber',
+    category: 'Fresh Produce (Tomatoes, Peppers & Vegetables)',
+    imageUrl: yamTubersWhole,
+    imageUrls: [yamTubersWhole],
+    available: true,
+  },
+
+  // --- Dry Fish & Crayfish ---
   {
     id: 'df1',
     name: 'Dry Crayfish',
     description: 'Carefully selected dried crayfish, perfect for adding authentic flavour to soups, stews and traditional African dishes.',
     price: 5.99,
     size: '250g',
-    category: 'Dry Foods',
+    category: 'Dry Fish & Crayfish',
     imageUrl: crayfishBasket,
     imageUrls: [crayfishBasket, crayfishMacro, crayfishScoop],
     available: true,
@@ -183,7 +194,7 @@ export const PRODUCTS: Product[] = [
     description: 'Premium quality dried stockfish. Requires soaking before use. Essential for traditional soups.',
     price: 18.50,
     size: '500g',
-    category: 'Dry Foods',
+    category: 'Dry Fish & Crayfish',
     imageUrl: 'https://i.ibb.co/7drmsRgH/stock1.jpg',
     imageUrls: [
       'https://i.ibb.co/7drmsRgH/stock1.jpg',
@@ -194,27 +205,12 @@ export const PRODUCTS: Product[] = [
     available: true,
   },
   {
-    id: 'df3',
-    name: 'Dried Bitter Leaf',
-    description: 'Washed and sun-dried bitter leaves, ready to be rehydrated for traditional soups.',
-    price: 3.50,
-    size: '100g',
-    category: 'Dry Foods',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Dried_bitter_leaf.jpg',
-    imageUrls: [
-      'https://upload.wikimedia.org/wikipedia/commons/b/b0/Dried_bitter_leaf.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/a/a1/Dry_bitter_leafs.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/8/85/Dried_leaves_on_sale_at_the_Monday_Market_in_Kakuri%2C_Kaduna_01.jpg'
-    ],
-    available: true,
-  },
-  {
     id: 'df4',
     name: 'Smoked Fish',
     description: 'Traditionally smoked catfish, cleaned and ready to add rich smoky flavour to your cooking.',
     price: 12.00,
     size: 'Medium Pack',
-    category: 'Dry Foods',
+    category: 'Dry Fish & Crayfish',
     imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/03/Dried_smoked_catfish.jpg',
     imageUrls: [
       'https://upload.wikimedia.org/wikipedia/commons/0/03/Dried_smoked_catfish.jpg',
@@ -229,7 +225,7 @@ export const PRODUCTS: Product[] = [
     id: 'osc1',
     name: 'Premium Red Palm Oil',
     description: 'Authentic, unrefined red palm oil sourced directly from West Africa. Perfect for traditional soups and stews.',
-    price: 6.99,
+    price: 6.99, // Base price for default size
     size: '1L',
     category: 'Oils, Sauces & Condiments',
     imageUrl: 'https://i.ibb.co/PGPT9pcK/palm1.jpg',
@@ -239,6 +235,12 @@ export const PRODUCTS: Product[] = [
       'https://i.ibb.co/pjfgV1bQ/palm3.jpg'
     ],
     available: true,
+    // NEW: Added Variants Example
+    variants: [
+      { size: '1L', price: 6.99 },
+      { size: '2L', price: 12.50 },
+      { size: '4L', price: 22.00 }
+    ]
   },
   {
     id: 'osc2',
@@ -250,13 +252,30 @@ export const PRODUCTS: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=800',
     available: true,
   },
+
+  // --- Spices & Seasonings ---
+  {
+    id: 'df3',
+    name: 'Dried Bitter Leaf',
+    description: 'Washed and sun-dried bitter leaves, ready to be rehydrated for traditional soups.',
+    price: 3.50,
+    size: '100g',
+    category: 'Spices & Seasonings',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Dried_bitter_leaf.jpg',
+    imageUrls: [
+      'https://upload.wikimedia.org/wikipedia/commons/b/b0/Dried_bitter_leaf.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/a/a1/Dry_bitter_leafs.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/8/85/Dried_leaves_on_sale_at_the_Monday_Market_in_Kakuri%2C_Kaduna_01.jpg'
+    ],
+    available: true,
+  },
   {
     id: 'osc3',
     name: 'Jollof Seasoning Blend',
     description: 'Our special blend of spices to give your Jollof rice that authentic party flavour.',
     price: 3.99,
     size: '150g',
-    category: 'Oils, Sauces & Condiments',
+    category: 'Spices & Seasonings',
     imageUrl: 'https://i.ibb.co/fdCSGRdF/joll1.jpg',
     imageUrls: [
       'https://i.ibb.co/fdCSGRdF/joll1.jpg',
@@ -272,7 +291,7 @@ export const PRODUCTS: Product[] = [
     description: 'Spicy peanut-based rub perfect for grilling meat, chicken, or fish.',
     price: 4.50,
     size: '200g',
-    category: 'Oils, Sauces & Condiments',
+    category: 'Spices & Seasonings',
     imageUrl: 'https://i.ibb.co/GfM4LFbk/suya-yaji-2.jpg',
     imageUrls: [
       'https://i.ibb.co/GfM4LFbk/suya-yaji-2.jpg',
@@ -283,14 +302,14 @@ export const PRODUCTS: Product[] = [
     available: true,
   },
 
-  // --- Snacks ---
+  // --- Snacks & Bakery ---
   {
     id: 'sn1',
     name: 'Spicy Plantain Chips',
     description: 'Crunchy, sweet and spicy plantain chips. The perfect on-the-go African snack.',
     price: 1.99,
     size: '150g',
-    category: 'Snacks',
+    category: 'Snacks & Bakery',
     imageUrl: plantainBowl,
     imageUrls: [plantainBowl, plantainMacro, plantainStack],
     available: true,
@@ -301,7 +320,7 @@ export const PRODUCTS: Product[] = [
     description: 'Classic Nigerian crunchy fried dough snack with a hint of nutmeg.',
     price: 4.50,
     size: '500g',
-    category: 'Snacks',
+    category: 'Snacks & Bakery',
     imageUrl: 'https://i.ibb.co/ZpwRfcm5/Nigerian-Chin-Chin-photo-2.jpg',
     imageUrls: [
       'https://i.ibb.co/ZpwRfcm5/Nigerian-Chin-Chin-photo-2.jpg',
@@ -316,7 +335,7 @@ export const PRODUCTS: Product[] = [
     description: 'Perfectly roasted peanuts, lightly salted. Great for pairing with garri.',
     price: 2.99,
     size: '250g',
-    category: 'Snacks',
+    category: 'Snacks & Bakery',
     imageUrl: 'https://i.ibb.co/MyJtvf4q/groundnut1.jpg',
     imageUrls: [
       'https://i.ibb.co/MyJtvf4q/groundnut1.jpg',
@@ -326,18 +345,94 @@ export const PRODUCTS: Product[] = [
     available: true,
   },
   {
+    id: 'bc2',
+    name: 'Meat Pie',
+    description: 'Classic Nigerian meat pie with a flaky, buttery crust and rich minced beef and potato filling.',
+    price: 3.50,
+    size: '1 piece',
+    category: 'Snacks & Bakery',
+    imageUrl: 'https://i.ibb.co/q3bsSr0Q/meatpie1.jpg',
+    imageUrls: [
+      'https://i.ibb.co/q3bsSr0Q/meatpie1.jpg',
+      'https://i.ibb.co/Qzm5XdT/meatpie2.jpg',
+      'https://i.ibb.co/QBgSxfy/meatpie3.png',
+      'https://i.ibb.co/4ZCJXh5K/meatpie4.jpg',
+      'https://i.ibb.co/8nVJkt5g/meatpie5.jpg'
+    ],
+    available: true,
+  },
+  {
+    id: 'bc4',
+    name: 'Chicken Pie',
+    description: 'Delicious flaky pastry filled with creamy, seasoned chicken breast pieces.',
+    price: 3.50,
+    size: '1 piece',
+    category: 'Snacks & Bakery',
+    imageUrl: 'https://i.ibb.co/RpYLB69z/pie1.jpg',
+    imageUrls: [
+      'https://i.ibb.co/RpYLB69z/pie1.jpg',
+      'https://i.ibb.co/MDdzRpDN/pie2.jpg',
+      'https://i.ibb.co/ZvyNsx7/pie3.jpg',
+      'https://i.ibb.co/SDH5bs5x/pie4.jpg'
+    ],
+    available: true,
+  },
+  
+  // --- Cooked Foods & Savouries ---
+  {
     id: 'sn4',
     name: 'Puff-Puff (Freshly Made)',
     description: 'Soft, spongy, and sweet deep-fried dough balls. Sold by the dozen.',
     price: 5.00,
     size: '12 pieces',
-    category: 'Snacks',
+    category: 'Cooked Foods & Savouries (Moi Moi, Small Chops)',
     imageUrl: 'https://i.ibb.co/fGvqP2g7/puff1.jpg',
     imageUrls: [
       'https://i.ibb.co/fGvqP2g7/puff1.jpg',
       'https://i.ibb.co/jvqRrs9T/puff2.jpg',
       'https://i.ibb.co/cckDp3NT/puff3.jpg',
       'https://i.ibb.co/wZmMGzbm/puff4.jpg'
+    ],
+    available: true,
+  },
+  {
+    id: 'sc1',
+    name: 'Party Small Chops Box',
+    description: 'A mix of spring rolls, samosas, puff-puff, and grilled chicken/peppered gizzard.',
+    size: 'Party Box',
+    category: 'Cooked Foods & Savouries (Moi Moi, Small Chops)',
+    imageUrl: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800',
+    available: true,
+  },
+  {
+    id: 'sc2',
+    name: 'Spring Rolls',
+    description: 'Crispy fried spring rolls packed with seasoned mixed vegetables.',
+    price: 5.00,
+    size: '10 pieces',
+    category: 'Cooked Foods & Savouries (Moi Moi, Small Chops)',
+    imageUrl: 'https://i.ibb.co/wrbTrnbs/spring1.jpg',
+    imageUrls: [
+      'https://i.ibb.co/wrbTrnbs/spring1.jpg',
+      'https://i.ibb.co/m5zZYnwf/spring2.jpg',
+      'https://i.ibb.co/4RcDPtSW/spring3.jpg',
+      'https://i.ibb.co/XPL1Vbq/spring4.jpg'
+    ],
+    available: true,
+  },
+  {
+    id: 'sc3',
+    name: 'Gizdodo',
+    description: 'Spicy peppered gizzard mixed with fried plantains. Perfect party starter.',
+    price: 12.00,
+    size: 'Medium Bowl',
+    category: 'Cooked Foods & Savouries (Moi Moi, Small Chops)',
+    imageUrl: 'https://i.ibb.co/wrBLgCpd/gizard1.jpg',
+    imageUrls: [
+      'https://i.ibb.co/wrBLgCpd/gizard1.jpg',
+      'https://i.ibb.co/hJ7tT2FH/gizard2.jpg',
+      'https://i.ibb.co/PZjBNnPd/gizard3.jpg',
+      'https://i.ibb.co/3yjwkGNW/gizard4.jpg'
     ],
     available: true,
   },
@@ -376,10 +471,40 @@ export const PRODUCTS: Product[] = [
     price: 2.50,
     size: '1L',
     category: 'Drinks & Beverages',
-    imageUrl: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=800', // Juice
+    imageUrl: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&q=80&w=800',
     available: true,
   },
 
+  // --- Fresh & Frozen Fish ---
+  {
+    id: 'ff1',
+    name: 'Frozen Croaker Fish',
+    description: 'Cleaned and whole frozen croaker fish. Perfect for grilling or making fish stew.',
+    price: 15.00,
+    size: '1kg',
+    category: 'Fresh & Frozen Fish',
+    imageUrl: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?auto=format&fit=crop&q=80&w=800',
+    available: true,
+    // NEW: Added Variants Example based on your pricing discussion
+    variants: [
+      { size: '1kg', price: 15.00 },
+      { size: '3 Pieces', price: 10.00 },
+      { size: '1 Box', price: 99.99 }
+    ]
+  },
+
+  // --- Meat & Poultry ---
+  {
+    id: 'ff3',
+    name: 'Hard Chicken (Hen)',
+    description: 'Frozen whole boiling fowl. Gives excellent flavour and rich stock for soups and stews.',
+    price: 8.50,
+    size: '1 Bird',
+    category: 'Meat & Poultry',
+    imageUrl: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?auto=format&fit=crop&q=80&w=800', 
+    available: true,
+  },
+  
   // --- African Ingredients ---
   {
     id: 'ai1',
@@ -387,7 +512,7 @@ export const PRODUCTS: Product[] = [
     description: 'Finely ground, premium quality egusi seeds, ready to be used in your favourite traditional soups.',
     price: 4.50,
     size: '500g',
-    category: 'African Ingredients',
+    category: 'Spices & Seasonings', // Moved Egusi to Spices & Seasonings logically
     imageUrl: egusiBowl,
     imageUrls: [egusiBowl, egusiMacro, egusiScoop],
     available: true,
@@ -398,7 +523,7 @@ export const PRODUCTS: Product[] = [
     description: 'Premium whole wild mango seeds, known for their excellent drawing texture in soups.',
     price: 8.99,
     size: '250g',
-    category: 'African Ingredients',
+    category: 'Spices & Seasonings', // Moved Ogbono to Spices & Seasonings
     imageUrl: 'https://i.ibb.co/wNLh2fjh/Obono1.jpg',
     imageUrls: [
       'https://i.ibb.co/wNLh2fjh/Obono1.jpg',
@@ -415,7 +540,7 @@ export const PRODUCTS: Product[] = [
     description: 'Traditional fermented locust beans. A staple flavour enhancer in many West African soups.',
     price: 2.50,
     size: '100g',
-    category: 'African Ingredients',
+    category: 'Spices & Seasonings', // Moved Iru to Spices & Seasonings
     imageUrl: 'https://i.ibb.co/yF5RxL61/Iru-4.jpg',
     imageUrls: [
       'https://i.ibb.co/yF5RxL61/Iru-4.jpg',
@@ -426,142 +551,13 @@ export const PRODUCTS: Product[] = [
     available: true,
   },
 
-  // --- Bakery & Cakes ---
-  {
-    id: 'bc1',
-    name: 'Custom Celebration Cake',
-    description: 'Beautiful custom cakes for birthdays, weddings, or any special event. Made to your specifications.',
-    size: 'Custom',
-    category: 'Bakery & Cakes',
-    imageUrl: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800',
-    available: true,
-  },
-  {
-    id: 'bc2',
-    name: 'Meat Pie',
-    description: 'Classic Nigerian meat pie with a flaky, buttery crust and rich minced beef and potato filling.',
-    price: 3.50,
-    size: '1 piece',
-    category: 'Bakery & Cakes',
-    imageUrl: 'https://i.ibb.co/q3bsSr0Q/meatpie1.jpg',
-    imageUrls: [
-      'https://i.ibb.co/q3bsSr0Q/meatpie1.jpg',
-      'https://i.ibb.co/Qzm5XdT/meatpie2.jpg',
-      'https://i.ibb.co/QBgSxfy/meatpie3.png',
-      'https://i.ibb.co/4ZCJXh5K/meatpie4.jpg',
-      'https://i.ibb.co/8nVJkt5g/meatpie5.jpg'
-    ],
-    available: true,
-  },
-  {
-    id: 'bc3',
-    name: 'Assorted Cupcakes',
-    description: 'Box of freshly baked cupcakes. Flavours include vanilla, chocolate, and red velvet.',
-    price: 15.00,
-    size: 'Box of 6',
-    category: 'Bakery & Cakes',
-    imageUrl: 'https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&q=80&w=800',
-    available: true,
-  },
-  {
-    id: 'bc4',
-    name: 'Chicken Pie',
-    description: 'Delicious flaky pastry filled with creamy, seasoned chicken breast pieces.',
-    price: 3.50,
-    size: '1 piece',
-    category: 'Bakery & Cakes',
-    imageUrl: 'https://i.ibb.co/RpYLB69z/pie1.jpg',
-    imageUrls: [
-      'https://i.ibb.co/RpYLB69z/pie1.jpg',
-      'https://i.ibb.co/MDdzRpDN/pie2.jpg',
-      'https://i.ibb.co/ZvyNsx7/pie3.jpg',
-      'https://i.ibb.co/SDH5bs5x/pie4.jpg'
-    ],
-    available: true,
-  },
-
-  // --- Small Chops & Savouries ---
-  {
-    id: 'sc1',
-    name: 'Party Small Chops Box',
-    description: 'A mix of spring rolls, samosas, puff-puff, and grilled chicken/peppered gizzard.',
-    size: 'Party Box',
-    category: 'Small Chops & Savouries',
-    imageUrl: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800',
-    available: true,
-  },
-  {
-    id: 'sc2',
-    name: 'Spring Rolls',
-    description: 'Crispy fried spring rolls packed with seasoned mixed vegetables.',
-    price: 5.00,
-    size: '10 pieces',
-    category: 'Small Chops & Savouries',
-    imageUrl: 'https://i.ibb.co/wrbTrnbs/spring1.jpg',
-    imageUrls: [
-      'https://i.ibb.co/wrbTrnbs/spring1.jpg',
-      'https://i.ibb.co/m5zZYnwf/spring2.jpg',
-      'https://i.ibb.co/4RcDPtSW/spring3.jpg',
-      'https://i.ibb.co/XPL1Vbq/spring4.jpg'
-    ],
-    available: true,
-  },
-  {
-    id: 'sc3',
-    name: 'Gizdodo',
-    description: 'Spicy peppered gizzard mixed with fried plantains. Perfect party starter.',
-    price: 12.00,
-    size: 'Medium Bowl',
-    category: 'Small Chops & Savouries',
-    imageUrl: 'https://i.ibb.co/wrBLgCpd/gizard1.jpg',
-    imageUrls: [
-      'https://i.ibb.co/wrBLgCpd/gizard1.jpg',
-      'https://i.ibb.co/hJ7tT2FH/gizard2.jpg',
-      'https://i.ibb.co/PZjBNnPd/gizard3.jpg',
-      'https://i.ibb.co/3yjwkGNW/gizard4.jpg'
-    ],
-    available: true,
-  },
-
-  // --- Frozen Foods ---
-  {
-    id: 'ff1',
-    name: 'Frozen Croaker Fish',
-    description: 'Cleaned and whole frozen croaker fish. Perfect for grilling or making fish stew.',
-    price: 15.00,
-    size: '1kg',
-    category: 'Frozen Foods',
-    imageUrl: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?auto=format&fit=crop&q=80&w=800',
-    available: true,
-  },
-  {
-    id: 'ff2',
-    name: 'Frozen Chopped Spinach',
-    description: 'Convenient chopped spinach, blanched and frozen. Great alternative for vegetable soups.',
-    price: 2.50,
-    size: '400g',
-    category: 'Frozen Foods',
-    imageUrl: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&q=80&w=800',
-    available: true,
-  },
-  {
-    id: 'ff3',
-    name: 'Hard Chicken (Hen)',
-    description: 'Frozen whole boiling fowl. Gives excellent flavour and rich stock for soups and stews.',
-    price: 8.50,
-    size: '1 Bird',
-    category: 'Frozen Foods',
-    imageUrl: 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?auto=format&fit=crop&q=80&w=800', // Raw meat
-    available: true,
-  },
-
-  // --- Special Orders ---
+  // --- Special Bulk Orders ---
   {
     id: 'so1',
     name: 'Event Small Chops Tray',
     description: 'Large catering tray of mixed small chops designed for weddings, parties, or corporate events.',
     size: 'Custom Tray',
-    category: 'Special Orders',
+    category: 'Special Bulk Orders',
     imageUrl: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&q=80&w=800',
     available: true,
   },
@@ -570,7 +566,7 @@ export const PRODUCTS: Product[] = [
     name: 'Corporate Bulk Grocery Order',
     description: 'Need to source African groceries in bulk for your restaurant, event, or business? Let us help.',
     size: 'Bulk',
-    category: 'Special Orders',
+    category: 'Special Bulk Orders',
     imageUrl: 'https://i.ibb.co/ZC50f96/bulk1.jpg',
     imageUrls: [
       'https://i.ibb.co/ZC50f96/bulk1.jpg',

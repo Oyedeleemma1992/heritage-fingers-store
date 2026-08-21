@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product } from '../data/products';
+import { Product, ProductVariant } from '../data/products';
 import { useOrder } from '../context/OrderContext';
 import { ShoppingBag, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -13,37 +13,47 @@ const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1596040033229-a9821ebd
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addItem } = useOrder();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // NEW: Handle variant selection state (defaults to first variant or product base price)
+  const variants: ProductVariant[] = product.variants || [];
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
+    variants.length > 0 ? variants[0] : { size: product.size, price: product.price || 0 }
+  );
+
+  const currentPrice = variants.length > 0 ? selectedVariant.price : (product.price || 0);
+  const currentSize = variants.length > 0 ? selectedVariant.size : product.size;
   
   const handleWhatsApp = () => {
-    const text = encodeURIComponent(`Hello Heritage Finger, I am interested in ordering ${product.name}. Please provide availability and price.`);
+    const text = encodeURIComponent(`Hello Heritage Finger, I am interested in ordering ${product.name} (${currentSize}). Please provide availability and price.`);
     window.open(`https://wa.me/447464053335?text=${text}`, '_blank');
+  };
+
+  const handleAddToCart = () => {
+    // Pass the item with the selected variant size and price
+    addItem({
+      ...product,
+      size: currentSize,
+      price: currentPrice
+    });
   };
 
   const getImages = () => {
     let parsed: string[] = [];
     
-    // 1. Check if the primary imageUrl is a comma-separated list (backend sometimes returns this)
     if (typeof product.imageUrl === 'string' && product.imageUrl.includes(',')) {
       parsed = product.imageUrl.split(',').map(s => s.trim());
-    }
-    // 2. Check if imageUrls array is provided
-    else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
+    } else if (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) {
       parsed = product.imageUrls;
-    } 
-    // 3. Check if imageUrls is a string (JSON or CSV)
-    else if (typeof product.imageUrls === 'string' && product.imageUrls.length > 0) {
+    } else if (typeof product.imageUrls === 'string' && product.imageUrls.length > 0) {
       try {
         parsed = JSON.parse(product.imageUrls as string);
       } catch {
         parsed = (product.imageUrls as string).split(',').map(s => s.trim());
       }
-    } 
-    // 4. Fallback to single primary image
-    else if (product.imageUrl) {
+    } else if (product.imageUrl) {
       parsed = [product.imageUrl];
     }
     
-    // Remove any empty strings or nulls
     return parsed.filter(Boolean);
   };
 
@@ -52,7 +62,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   useEffect(() => {
     if (images.length <= 1) return;
     
-    // Reset index if out of bounds (e.g. after filtering/navigating)
     if (currentImageIndex >= images.length) {
       setCurrentImageIndex(0);
     }
@@ -143,23 +152,44 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="flex flex-col flex-grow p-5">
         <div className="flex justify-between items-start mb-2">
           <p className="text-xs font-medium text-[#C96B3B] uppercase tracking-wider">{product.category}</p>
-          <span className="text-sm text-gray-500">{product.size}</span>
+          <span className="text-sm text-gray-500">{currentSize}</span>
         </div>
         
         <h3 className="font-serif text-lg font-bold text-[#183C2B] mb-2 line-clamp-1">{product.name}</h3>
         <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-grow">{product.description}</p>
         
+        {/* NEW: Variant Size Selector Dropdown if variants exist */}
+        {variants.length > 0 && (
+          <div className="mb-4">
+            <label className="block text-xs font-medium text-gray-500 mb-1">Select Size / Option:</label>
+            <select
+              value={selectedVariant.size}
+              onChange={(e) => {
+                const found = variants.find(v => v.size === e.target.value);
+                if (found) setSelectedVariant(found);
+              }}
+              className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:ring-1 focus:ring-[#183C2B]"
+            >
+              {variants.map((v, i) => (
+                <option key={i} value={v.size}>
+                  {v.size} — £{v.price.toFixed(2)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="flex items-center justify-between mt-auto mb-4">
           <span className="text-lg font-bold text-[#171717]">
-            {product.price ? `£${product.price.toFixed(2)}` : 'Price on request'}
+            {currentPrice ? `£${currentPrice.toFixed(2)}` : 'Price on request'}
           </span>
         </div>
         
         <div className="grid grid-cols-2 gap-2">
-          {product.price ? (
+          {currentPrice ? (
             <>
               <button
-                onClick={() => addItem(product)}
+                onClick={handleAddToCart}
                 disabled={!product.available}
                 className={cn(
                   "flex items-center justify-center py-2 px-3 rounded-lg text-sm font-medium transition-colors",

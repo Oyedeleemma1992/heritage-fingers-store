@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Product } from '../data/products';
+import { Product, ProductVariant } from '../data/products';
 
 interface ProductContextType {
   products: Product[];
@@ -37,12 +37,22 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const data = await response.json();
       const productsData = Array.isArray(data) ? data : (data.data || []);
       
-      // Parse multi-image comma separated strings and format products
+      // Parse multi-image comma separated strings, variants JSON, and format products
       const formattedProducts = productsData.map((p: any) => {
         const rawImg = p.image_url || p.imageUrl || '';
         const imgArray = typeof rawImg === 'string'
           ? rawImg.split(',').map((u: string) => u.trim()).filter(Boolean)
           : (Array.isArray(rawImg) ? rawImg : []);
+
+        // Parse variants JSON from database if available
+        let parsedVariants: ProductVariant[] = [];
+        if (p.variants) {
+          try {
+            parsedVariants = typeof p.variants === 'string' ? JSON.parse(p.variants) : p.variants;
+          } catch (e) {
+            console.error('Failed to parse product variants:', e);
+          }
+        }
 
         return {
           id: p.id ? String(p.id) : `prod_${Math.random()}`,
@@ -54,6 +64,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
           imageUrl: imgArray[0] || rawImg || 'https://via.placeholder.com/400',
           imageUrls: imgArray.length > 0 ? imgArray : [rawImg || 'https://via.placeholder.com/400'],
           available: p.available !== false && p.available !== 0 && p.available !== '0',
+          variants: parsedVariants.length > 0 ? parsedVariants : undefined,
         };
       });
       
@@ -80,7 +91,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         price: newProduct.price,
         size: newProduct.size || 'N/A',
         image_url: newProduct.imageUrl || (newProduct as any).image_url || '',
-        available: newProduct.available ?? true
+        available: newProduct.available ?? true,
+        variants: newProduct.variants || null
       };
 
       const response = await fetch('https://heritagefingers.com/api.php?action=add_product', {
@@ -121,7 +133,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
         price: merged.price,
         size: merged.size,
         image_url: imageUrlString,
-        available: merged.available ? 1 : 0
+        available: merged.available ? 1 : 0,
+        variants: merged.variants || null
       };
 
       const response = await fetch('https://heritagefingers.com/api.php?action=update_product', {
@@ -141,13 +154,28 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  // LIVE API: Delete Product
+  // LIVE API: Delete Product from MySQL
   const deleteProduct = async (id: string) => {
     try {
+      // Optimistically remove from state so UI updates instantly
       setProducts((prev) => prev.filter((p) => p.id !== id));
-      // Optionally ping delete endpoint if implemented
+
+      const response = await fetch(`https://heritagefingers.com/api.php?action=delete_product&id=${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: Number(id) })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        await fetchProducts(); // Sync state with database
+      } else {
+        console.error('Failed to delete product from database:', result);
+        await fetchProducts(); // Revert state if server delete failed
+      }
     } catch (err) {
       console.error('Error deleting product:', err);
+      await fetchProducts(); // Revert state if network error occurred
     }
   };
 

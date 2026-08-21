@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../context/ProductContext';
-import { Product } from '../types';
+import { Product, ProductVariant } from '../types';
 import { Plus, Edit2, Trash2, X, Save, LogOut } from 'lucide-react';
 import { CATEGORIES } from '../data/products';
 
@@ -35,6 +35,7 @@ export const Admin = () => {
   const { products, loading, error, addProduct, updateProduct, deleteProduct } = useProducts();
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Partial<Product>>({});
+  const [variantsList, setVariantsList] = useState<ProductVariant[]>([]);
 
   const handleAdd = () => {
     setCurrentProduct({
@@ -46,11 +47,13 @@ export const Admin = () => {
       imageUrl: '',
       available: true
     });
+    setVariantsList([]);
     setIsEditing(true);
   };
 
   const handleEdit = (product: Product) => {
     setCurrentProduct(product);
+    setVariantsList(product.variants || []);
     setIsEditing(true);
   };
 
@@ -60,15 +63,35 @@ export const Admin = () => {
     }
   };
 
+  const handleAddVariant = () => {
+    setVariantsList([...variantsList, { size: '', price: 0 }]);
+  };
+
+  const handleVariantChange = (index: number, field: 'size' | 'price', value: string | number) => {
+    const updated = [...variantsList];
+    updated[index] = { ...updated[index], [field]: field === 'price' ? parseFloat(value as string) || 0 : value };
+    setVariantsList(updated);
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    setVariantsList(variantsList.filter((_, i) => i !== index));
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const productPayload = {
+      ...currentProduct,
+      variants: variantsList.length > 0 ? variantsList : undefined
+    };
+
     if (currentProduct.id) {
-      await updateProduct(currentProduct.id, currentProduct);
+      await updateProduct(currentProduct.id, productPayload);
     } else {
-      await addProduct(currentProduct as Omit<Product, 'id'>);
+      await addProduct(productPayload as Omit<Product, 'id'>);
     }
     setIsEditing(false);
     setCurrentProduct({});
+    setVariantsList([]);
   };
 
   if (!isAuthenticated) {
@@ -189,7 +212,7 @@ export const Admin = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price (£) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Default Price (£) *</label>
                 <input
                   type="number"
                   step="0.01"
@@ -200,17 +223,59 @@ export const Admin = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Size/Weight *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Default Size / Unit *</label>
                 <input
                   type="text"
                   required
                   value={currentProduct.size || ''}
                   onChange={(e) => setCurrentProduct({ ...currentProduct, size: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#183C2B]"
+                  placeholder="e.g. 1kg, 1L, 3 Pieces"
                 />
               </div>
+
+              {/* NEW: Size & Price Variants Builder */}
+              <div className="md:col-span-2 border-t border-gray-100 pt-4">
+                <div className="flex justify-between items-center mb-3">
+                  <label className="block text-sm font-medium text-gray-700">Size & Price Variants (Optional for items with multiple tiers like Liters, Boxes, Pieces)</label>
+                  <button
+                    type="button"
+                    onClick={handleAddVariant}
+                    className="text-xs px-3 py-1.5 bg-gray-100 text-[#183C2B] font-semibold rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    + Add Variant Option
+                  </button>
+                </div>
+                {variantsList.map((variant, index) => (
+                  <div key={index} className="flex gap-4 items-center mb-3">
+                    <input
+                      type="text"
+                      placeholder="Size/Unit (e.g., 4L or 1 Box)"
+                      value={variant.size}
+                      onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
+                      className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Price (£)"
+                      value={variant.price || ''}
+                      onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                      className="w-32 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveVariant(index)}
+                      className="text-red-500 hover:text-red-700 p-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL (or ImgBB Link) *</label>
                 <input
                   type="url"
                   required
@@ -250,7 +315,7 @@ export const Admin = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price / Variants</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -275,6 +340,11 @@ export const Admin = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       £{product.price?.toFixed(2) || '0.00'}
+                      {product.variants && product.variants.length > 0 && (
+                        <span className="block text-xs text-indigo-600 font-medium">
+                          (+{product.variants.length} size tiers)
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
