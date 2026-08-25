@@ -120,10 +120,13 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const merged = { ...existing, ...updatedFields };
 
-      // Convert imageUrls array back into a comma-separated string if present
-      const imageUrlString = Array.isArray(merged.imageUrls) && merged.imageUrls.length > 0
-        ? merged.imageUrls.join(',')
-        : (merged.imageUrl || '');
+      // CRITICAL FIX: Prioritize the explicitly updated imageUrl string from Admin.tsx.
+      // If we don't do this, the old broken link trapped in merged.imageUrls will overwrite the new upload!
+      const imageUrlString = updatedFields.imageUrl !== undefined 
+        ? updatedFields.imageUrl 
+        : (Array.isArray(merged.imageUrls) && merged.imageUrls.length > 0
+            ? merged.imageUrls.join(',')
+            : (merged.imageUrl || ''));
 
       const payload = {
         id: Number(id),
