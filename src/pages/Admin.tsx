@@ -83,9 +83,9 @@ export const Admin = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    let finalImageUrl = currentProduct.imageUrl;
+    let finalImageUrl = currentProduct.imageUrl || '';
 
-    // If a new image file was chosen from the device, upload it via upload.php first
+    // If a new file is chosen, upload it and override any old/broken link
     if (imageFile) {
       const formData = new FormData();
       formData.append('product_image', imageFile);
@@ -309,7 +309,7 @@ export const Admin = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Product Image *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload New Product Image (Overrides existing)</label>
                 <input
                   type="file"
                   accept="image/*"
