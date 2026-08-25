@@ -85,6 +85,7 @@ export const Admin = () => {
     
     let finalImageUrl = currentProduct.imageUrl;
 
+    // If a new image file was chosen from the device, upload it via upload.php first
     if (imageFile) {
       const formData = new FormData();
       formData.append('product_image', imageFile);
