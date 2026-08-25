@@ -36,6 +36,7 @@ export const Admin = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Partial<Product>>({});
   const [variantsList, setVariantsList] = useState<ProductVariant[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleAdd = () => {
     setCurrentProduct({
@@ -48,12 +49,14 @@ export const Admin = () => {
       available: true
     });
     setVariantsList([]);
+    setImageFile(null);
     setIsEditing(true);
   };
 
   const handleEdit = (product: Product) => {
     setCurrentProduct(product);
     setVariantsList(product.variants || []);
+    setImageFile(null);
     setIsEditing(true);
   };
 
@@ -79,8 +82,37 @@ export const Admin = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    let finalImageUrl = currentProduct.imageUrl;
+
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('product_image', imageFile);
+
+      try {
+        const uploadResponse = await fetch('/upload.php', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const uploadData = await uploadResponse.json();
+        
+        if (uploadData.success) {
+          finalImageUrl = uploadData.imageUrl;
+        } else {
+          alert('Image upload failed. Please try again.');
+          return;
+        }
+      } catch (err) {
+        console.error('Upload error:', err);
+        alert('Error connecting to image server.');
+        return;
+      }
+    }
+
     const productPayload = {
       ...currentProduct,
+      imageUrl: finalImageUrl,
       variants: variantsList.length > 0 ? variantsList : undefined
     };
 
@@ -89,9 +121,11 @@ export const Admin = () => {
     } else {
       await addProduct(productPayload as Omit<Product, 'id'>);
     }
+    
     setIsEditing(false);
     setCurrentProduct({});
     setVariantsList([]);
+    setImageFile(null);
   };
 
   if (!isAuthenticated) {
@@ -234,10 +268,9 @@ export const Admin = () => {
                 />
               </div>
 
-              {/* NEW: Size & Price Variants Builder */}
               <div className="md:col-span-2 border-t border-gray-100 pt-4">
                 <div className="flex justify-between items-center mb-3">
-                  <label className="block text-sm font-medium text-gray-700">Size & Price Variants (Optional for items with multiple tiers like Liters, Boxes, Pieces)</label>
+                  <label className="block text-sm font-medium text-gray-700">Size & Price Variants (Optional)</label>
                   <button
                     type="button"
                     onClick={handleAddVariant}
@@ -275,16 +308,24 @@ export const Admin = () => {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL (or ImgBB Link) *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Product Image *</label>
                 <input
-                  type="url"
-                  required
-                  value={currentProduct.imageUrl || ''}
-                  onChange={(e) => setCurrentProduct({ ...currentProduct, imageUrl: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageFile(e.target.files[0]);
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#183C2B]"
-                  placeholder="https://..."
                 />
+                {currentProduct.imageUrl && !imageFile && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Current image: <img src={currentProduct.imageUrl} alt="preview" className="h-10 w-10 mt-1 rounded object-cover inline-block ml-2" />
+                  </p>
+                )}
               </div>
+              
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Short Description *</label>
                 <textarea

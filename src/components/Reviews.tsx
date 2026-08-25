@@ -9,32 +9,31 @@ interface Review {
   date: string;
 }
 
-const DEFAULT_REVIEWS: Review[] = [
-  { id: '1', name: 'Sarah J.', rating: 5, comment: 'Amazing quality! The palm oil is so authentic.', date: new Date().toISOString() },
-  { id: '2', name: 'Michael O.', rating: 4, comment: 'Fast delivery, good packaging. Will order again.', date: new Date().toISOString() }
-];
-
 export const Reviews = () => {
-  const [reviews, setReviews] = useState<Review[]>(() => {
-    const saved = localStorage.getItem('heritage_reviews');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return DEFAULT_REVIEWS;
-  });
-
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [name, setName] = useState('');
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
 
+  // 1. Fetch reviews from the server when the component loads
   useEffect(() => {
-    localStorage.setItem('heritage_reviews', JSON.stringify(reviews));
-  }, [reviews]);
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch('/reviews.php');
+        if (response.ok) {
+          const data = await response.json();
+          setReviews(data);
+        }
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    };
+    
+    fetchReviews();
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !comment.trim()) return;
 
@@ -46,10 +45,29 @@ export const Reviews = () => {
       date: new Date().toISOString()
     };
 
-    setReviews([newReview, ...reviews]);
-    setName('');
-    setComment('');
-    setRating(5);
+    try {
+      // 2. Send the new review to the server to save permanently
+      const response = await fetch('/reviews.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newReview),
+      });
+
+      if (response.ok) {
+        // Update the screen immediately so the customer sees their review
+        setReviews([newReview, ...reviews]);
+        setName('');
+        setComment('');
+        setRating(5);
+      } else {
+        alert('Failed to submit review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Error connecting to the server.');
+    }
   };
 
   return (
