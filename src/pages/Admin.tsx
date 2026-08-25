@@ -321,8 +321,8 @@ export const Admin = () => {
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#183C2B]"
                 />
                 {currentProduct.imageUrl && !imageFile && (
-                  <p className="mt-2 text-sm text-gray-500">
-                    Current image: <img src={currentProduct.imageUrl} alt="preview" className="h-10 w-10 mt-1 rounded object-cover inline-block ml-2" />
+                  <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
+                    Current image: <img src={currentProduct.imageUrl} alt="preview" className="h-10 w-10 mt-1 rounded object-cover inline-block" />
                   </p>
                 )}
               </div>
